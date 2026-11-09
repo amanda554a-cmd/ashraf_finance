@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ashraf Finance — Verification results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-page: #FFFFFF;
+    --bg-subtle: #F9FAFB;
+    --border: #E5E7EB;
+    --border-subtle: #F3F4F6;
+    --text-primary: #111827;
+    --text-secondary: #4B5563;
+    --text-muted: #6B7280;
+    --text-light: #9CA3AF;
+    
+    --brand-teal: #007A64;
+    --brand-teal-light: #E6F4F1;
+    --brand-teal-dark: #005F4E;
+    
+    --alert-orange-bg: #FFF7ED;
+    --alert-orange-text: #C2410C;
+    --alert-orange-border: #FFEDD5;
+
+    --alert-red-bg: #FEF2F2;
+    --alert-red-text: #B91C1C;
+    --alert-red-border: #FEE2E2;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Header ── */
+  .brand-bar {
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand-logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-logo-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--brand-teal);
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    color: #FFFFFF;
+  }
+  .brand-logo-text {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #111827;
+  }
+  .engine-pill {
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .engine-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--brand-teal);
+  }
+
+  /* ── Main Container ── */
+  .main-wrap {
+    max-width: 920px;
+    margin: 28px auto 60px;
+    padding: 0 24px;
+  }
+
+  /* ── Clean Default Drag & Drop Zone ── */
+  .upload-container {
+    margin-bottom: 24px;
+  }
+  .drop-box {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #F8FAFC;
+    padding: 22px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: block;
+  }
+  .drop-box:hover, .drop-box.dragover {
+    border-color: var(--brand-teal);
+    background: var(--brand-teal-light);
+  }
+  .drop-box input { display: none; }
+  .drop-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    margin: 0 auto 8px;
+    color: var(--brand-teal);
+  }
+  .drop-heading {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .drop-heading .link-text {
+    color: var(--brand-teal);
+    text-decoration: underline;
+  }
+  .drop-subheading {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* Status / Loading indicator */
+  .status-indicator {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--brand-teal);
+  }
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--brand-teal-light);
+    border-top-color: var(--brand-teal);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Uploaded Inputs Preview Bar ── */
+  .previews-section {
+    display: none;
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .previews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .previews-title {
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+  .btn-clear {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 11.5px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .btn-clear:hover {
+    color: var(--alert-red-text);
+  }
+  .previews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+  }
+  .preview-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+  }
+  .preview-thumb {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 4px;
+    background: #E2E8F0;
+    flex-shrink: 0;
+  }
+  .preview-info {
+    overflow: hidden;
+  }
+  .preview-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .preview-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .preview-role {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--brand-teal);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Verification Results Section ── */
+  .page-title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #111827;
+    margin-bottom: 18px;
+  }
+
+  /* ── Block 1: Side-by-Side Image Cards ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .evidence-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #FFF;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .card-topbar {
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .card-top-left {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .card-top-left svg {
+    color: var(--text-muted);
+  }
+  .card-action-icon {
+    color: var(--text-muted);
+  }
+
+  .card-viewport {
+    background: #F3F4F6;
+    height: 250px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .card-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--border);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--text-secondary);
+    z-index: 2;
+  }
+  .card-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .card-bottombar {
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border-subtle);
+    background: #FFF;
+  }
+  .card-file-info {
+    overflow: hidden;
+  }
+  .card-filename {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .card-filemeta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 1px;
+    font-family: 'Inter', sans-serif;
+  }
+  .card-bottom-icon {
+    color: var(--text-light);
+    flex-shrink: 0;
+  }
+
+  /* ── Block 2: Similarity Score Row ── */
+  .similarity-row {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #FFF;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .sim-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .sim-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--brand-teal-light);
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    color: var(--brand-teal);
+  }
+
+  .sim-right {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .score-val-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .score-num {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #111827;
+    line-height: 1;
+  }
+  .score-underline {
+    width: 100%;
+    height: 3px;
+    background: var(--brand-teal);
+    border-radius: 2px;
+    margin-top: 4px;
+  }
+  .score-underline.mismatch {
+    background: var(--alert-red-text);
+  }
+  .score-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--brand-teal);
+  }
+  .score-label.mismatch {
+    color: var(--alert-red-text);
+  }
+
+  /* ── Block 3: EXIF & File Metadata Table ── */
+  .table-section {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #FFF;
+    overflow: hidden;
+  }
+  .table-header-bar {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .table-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .table-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+  }
+  .table-badge {
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--brand-teal-light);
+    color: var(--brand-teal);
+    padding: 2px 8px;
+    border-radius: 12px;
+  }
+  .table-search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #F9FAFB;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    color: var(--text-muted);
+  }
+  .meta-search-input {
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    color: var(--text-primary);
+    outline: none;
+    width: 220px;
+    font-family: inherit;
+  }
+  .meta-search-input::placeholder {
+    color: var(--text-light);
+  }
+
+  .metadata-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .metadata-table th {
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    background: #FAFAFA;
+  }
+  .metadata-table td {
+    padding: 10px 20px;
+    font-size: 12.5px;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+  }
+  .metadata-table tr:last-child td {
+    border-bottom: none;
+  }
+  .col-field {
+    width: 28%;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  .col-id {
+    width: 36%;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    word-break: break-all;
+  }
+  .col-selfie {
+    width: 36%;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    word-break: break-all;
+  }
+
+  /* Warning Highlight for Edited Software */
+  .highlight-chip {
+    display: inline-block;
+    background: var(--alert-orange-bg);
+    color: var(--alert-orange-text);
+    border: 1px solid var(--alert-orange-border);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 11.5px;
+  }
+
+  /* Empty State Guide */
+  .empty-state-guide {
+    margin-top: 16px;
+    padding: 44px 20px;
+    background: #FAFAFA;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .empty-state-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    color: var(--brand-teal);
+    margin-bottom: 12px;
+  }
+  .empty-state-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .empty-state-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    max-width: 500px;
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  /* Fade in animation for results */
+  .fade-in {
+    animation: fadeIn 0.25s ease forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 640px) {
+    .cards-grid { grid-template-columns: 1fr; }
+    .brand-bar { padding: 14px 18px; }
+    .similarity-row { flex-direction: column; gap: 12px; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar (Clean & Exact to Reference) -->
+  <header class="brand-bar">
+    <div class="brand-logo-wrap">
+      <div class="brand-logo-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+      </div>
+      <span class="brand-logo-text">Ashraf Finance</span>
+    </div>
+
+    <div class="engine-pill">
+      <span class="engine-dot"></span>
+      <span>Automated Biometric Verifier</span>
+    </div>
+  </header>
+
+  <!-- Main Viewport -->
+  <main class="main-wrap">
+
+    <!-- ── Default Drag & Drop Area ── -->
+    <section class="upload-container">
+      <label class="drop-box" id="drop-box">
+        <input type="file" id="file-input" accept="image/*" multiple onchange="onFilesSelected(event)">
+        <div class="drop-icon-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div class="drop-heading">
+          Drag &amp; drop 1 or 2 images here, or <span class="link-text">browse files</span>
+        </div>
+        <div class="drop-subheading">
+          Upload 1 image (Selfie holding ID) or 2 images (ID card + Selfie) • Automatic detection
+        </div>
+      </label>
+
+      <div class="status-indicator" id="status-indicator">
+        <div class="spinner"></div>
+        <span>Analyzing facial biometrics and metadata...</span>
+      </div>
+
+      <!-- Uploaded Inputs Preview Bar -->
+      <div class="previews-section" id="previews-section">
+        <div class="previews-header">
+          <span class="previews-title" id="previews-mode-label">Uploaded Inputs</span>
+          <button type="button" class="btn-clear" onclick="resetUploads()">✕ Clear inputs</button>
+        </div>
+        <div class="previews-grid" id="previews-grid"></div>
+      </div>
+    </section>
+
+    <!-- ── Empty State Guide (Shown by default when no images are uploaded) ── -->
+    <div class="empty-state-guide" id="empty-state-guide">
+      <div class="empty-state-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><line x1="15" y1="8" x2="17" y2="8"/><line x1="15" y1="12" x2="17" y2="12"/><path d="M7 21v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2"/></svg>
+      </div>
+      <div class="empty-state-title">Awaiting KYC Verification Upload</div>
+      <div class="empty-state-desc">Drag and drop 1 image (Selfie holding ID) or 2 images (ID Card + Selfie) above to start automated facial biometric verification, tamper analysis, and complete EXIF forensic metadata extraction.</div>
+    </div>
+
+    <!-- ── Verification Results Section (Hidden until an image is uploaded) ── -->
+    <div id="results-section" style="display: none;">
+
+      <h1 class="page-title">Verification results</h1>
+
+      <!-- ── Block 1: Side-by-Side Image Cards ── -->
+      <section class="cards-grid">
+        
+        <!-- Card 1: ID Card -->
+        <article class="evidence-card">
+          <div class="card-topbar">
+            <div class="card-top-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><line x1="15" y1="8" x2="17" y2="8"/><line x1="15" y1="12" x2="17" y2="12"/></svg>
+              <span id="label-card-id">ID card</span>
+            </div>
+            <div class="card-action-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+            </div>
+          </div>
+
+          <div class="card-viewport">
+            <span class="card-badge" id="badge-card-id">EXTRACTED</span>
+            <img class="card-img" id="img-card-id" alt="ID Card">
+          </div>
+
+          <div class="card-bottombar">
+            <div class="card-file-info">
+              <div class="card-filename" id="fname-card-id">id_card.jpg</div>
+              <div class="card-filemeta" id="fmeta-card-id">—</div>
+            </div>
+            <div class="card-bottom-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 2: Selfie Holding ID -->
+        <article class="evidence-card">
+          <div class="card-topbar">
+            <div class="card-top-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span id="label-card-selfie">Selfie holding ID</span>
+            </div>
+            <div class="card-action-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+            </div>
+          </div>
+
+          <div class="card-viewport">
+            <span class="card-badge" id="badge-card-selfie">UPLOADED</span>
+            <img class="card-img" id="img-card-selfie" alt="Selfie holding ID">
+          </div>
+
+          <div class="card-bottombar">
+            <div class="card-file-info">
+              <div class="card-filename" id="fname-card-selfie">selfie.jpg</div>
+              <div class="card-filemeta" id="fmeta-card-selfie">—</div>
+            </div>
+            <div class="card-bottom-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- ── Block 2: Similarity Metric Strip ── -->
+      <section class="similarity-row">
+        <div class="sim-left">
+          <div class="sim-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          </div>
+          <span>ID card ↔ Selfie holding ID</span>
+        </div>
+
+        <div class="sim-right">
+          <div class="score-val-wrap">
+            <div class="score-num" id="sim-score">0.0%</div>
+            <div class="score-underline" id="sim-underline"></div>
+          </div>
+          <div class="score-label" id="sim-label">Analyzing</div>
+        </div>
+      </section>
+
+      <!-- ── Block 3: EXIF & File Metadata Table ── -->
+      <section class="table-section">
+        <div class="table-header-bar">
+          <div class="table-title-group">
+            <div class="table-title">EXIF &amp; file metadata</div>
+            <span class="table-badge" id="fields-badge">0 fields</span>
+          </div>
+          <div class="table-search-wrap">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="meta-search" class="meta-search-input" placeholder="Search metadata fields..." oninput="filterMetadata(this.value)">
+          </div>
+        </div>
+
+        <table class="metadata-table">
+          <thead>
+            <tr>
+              <th class="col-field">METADATA FIELD</th>
+              <th class="col-id" id="th-col-id">ID CARD</th>
+              <th class="col-selfie" id="th-col-selfie">SELFIE HOLDING ID</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <!-- Populated dynamically by JavaScript -->
+          </tbody>
+        </table>
+      </section>
+
+    </div>
+
+  </main>
+
+<script>
+let currentFiles = [];
+let currentTableRows = [];
+
+// Drag and drop events
+const dropBox = document.getElementById('drop-box');
+
+['dragover', 'dragenter'].forEach(evt => {
+  dropBox.addEventListener(evt, (e) => {
+    e.preventDefault();
+    dropBox.classList.add('dragover');
+  });
+});
+
+['dragleave', 'drop'].forEach(evt => {
+  dropBox.addEventListener(evt, (e) => {
+    e.preventDefault();
+    dropBox.classList.remove('dragover');
+  });
+});
+
+dropBox.addEventListener('drop', (e) => {
+  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    processFiles(Array.from(e.dataTransfer.files));
+  }
+});
+
+function onFilesSelected(e) {
+  if (e.target.files && e.target.files.length > 0) {
+    processFiles(Array.from(e.target.files));
+  }
+}
+
+// Global Paste
+window.addEventListener('paste', (e) => {
+  const items = e.clipboardData?.items || [];
+  const files = [];
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].type.startsWith('image/')) {
+      const f = items[i].getAsFile();
+      if (f) files.push(f);
+    }
+  }
+  if (files.length > 0) processFiles(files);
+});
+
+async function processFiles(files) {
+  const imageFiles = files.filter(f => f.type.startsWith('image/'));
+  if (imageFiles.length === 0) return alert('Please upload image files (JPG or PNG).');
+
+  currentFiles = imageFiles.slice(0, 2);
+  renderInputPreviews(currentFiles);
+
+  const statusEl = document.getElementById('status-indicator');
+  statusEl.style.display = 'flex';
+
+  const fd = new FormData();
+  if (currentFiles.length === 1) {
+    fd.append('mode', 'single');
+    fd.append('image1', currentFiles[0]);
+  } else {
+    fd.append('mode', 'dual');
+    fd.append('image1', currentFiles[0]);
+    fd.append('image2', currentFiles[1]);
+  }
+
+  try {
+    const res = await fetch('/api/verify', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Verification failed');
+    renderResults(data);
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    statusEl.style.display = 'none';
+  }
+}
+
+function renderInputPreviews(files) {
+  const sec = document.getElementById('previews-section');
+  const grid = document.getElementById('previews-grid');
+  const modeLabel = document.getElementById('previews-mode-label');
+
+  if (files.length === 1) {
+    modeLabel.textContent = '1 Input Image (Auto-detected: Selfie holding ID)';
+  } else {
+    modeLabel.textContent = '2 Input Images (Auto-detected: Dual-image comparison)';
+  }
+
+  let html = '';
+  files.forEach((file, idx) => {
+    const url = URL.createObjectURL(file);
+    const sizeStr = (file.size / 1024).toFixed(1) + ' KB';
+    const role = files.length === 1 ? 'Source Photo' : (idx === 0 ? 'Input 1: Selfie' : 'Input 2: ID Card');
+    html += `
+      <div class="preview-card">
+        <img class="preview-thumb" src="${url}" alt="thumb">
+        <div class="preview-info">
+          <div class="preview-role">${role}</div>
+          <div class="preview-name">${file.name}</div>
+          <div class="preview-meta">${sizeStr}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  grid.innerHTML = html;
+  sec.style.display = 'block';
+}
+
+function resetUploads() {
+  currentFiles = [];
+  currentTableRows = [];
+  document.getElementById('file-input').value = '';
+  document.getElementById('previews-section').style.display = 'none';
+  document.getElementById('results-section').style.display = 'none';
+  document.getElementById('empty-state-guide').style.display = 'flex';
+  document.getElementById('meta-search').value = '';
+}
+
+function renderResults(d) {
+  // Hide empty state guide, show results section
+  document.getElementById('empty-state-guide').style.display = 'none';
+  const resultsEl = document.getElementById('results-section');
+  resultsEl.style.display = 'block';
+  resultsEl.classList.remove('fade-in');
+  void resultsEl.offsetWidth; // Trigger reflow for animation
+  resultsEl.classList.add('fade-in');
+
+  // 1. Cards Block
+  document.getElementById('img-card-id').src = d.card_id.image_b64;
+  document.getElementById('label-card-id').textContent = d.card_id.label;
+  document.getElementById('fname-card-id').textContent = d.card_id.filename;
+  document.getElementById('fmeta-card-id').textContent = d.card_id.footer;
+  document.getElementById('badge-card-id').textContent = d.card_id.badge;
+
+  document.getElementById('img-card-selfie').src = d.card_selfie.image_b64;
+  document.getElementById('fname-card-selfie').textContent = d.card_selfie.filename;
+  document.getElementById('fmeta-card-selfie').textContent = d.card_selfie.footer;
+  document.getElementById('badge-card-selfie').textContent = d.card_selfie.badge;
+
+  // 2. Similarity Metric
+  const simScore = document.getElementById('sim-score');
+  const simLabel = document.getElementById('sim-label');
+  const simLine = document.getElementById('sim-underline');
+
+  simScore.textContent = d.similarity_pct;
+  simLabel.textContent = d.similarity_label;
+
+  if (d.is_match) {
+    simLabel.className = 'score-label';
+    simLine.className = 'score-underline';
+  } else {
+    simLabel.className = 'score-label mismatch';
+    simLine.className = 'score-underline mismatch';
+  }
+
+  // 3. Metadata Table
+  document.getElementById('th-col-id').textContent = d.table.col_id_title;
+  document.getElementById('th-col-selfie').textContent = d.table.col_selfie_title;
+  currentTableRows = d.table.rows;
+  document.getElementById('meta-search').value = '';
+  document.getElementById('fields-badge').textContent = `Showing all ${currentTableRows.length} metadata fields`;
+
+  renderTableBody(currentTableRows);
+}
+
+function renderTableBody(rows) {
+  const tbody = document.getElementById('table-body');
+  let html = '';
+  rows.forEach(r => {
+    let selfieHtml = formatVal(r.val_selfie, r.highlight);
+    let idHtml = formatVal(r.val_id, r.highlight && (r.val_id && (r.val_id.includes('Photoshop') || r.val_id.includes('Tamper') || r.val_id.includes('mismatch'))));
+
+    html += `
+      <tr>
+        <td class="col-field">${escapeHtml(r.field)}</td>
+        <td class="col-id">${idHtml}</td>
+        <td class="col-selfie">${selfieHtml}</td>
+      </tr>
+    `;
+  });
+  tbody.innerHTML = html;
+}
+
+function formatVal(val, isHighlight) {
+  if (val === undefined || val === null || val === '') return '<span style="color:var(--text-light);font-style:italic;">Not available</span>';
+  const str = String(val);
+  if (isHighlight || str.includes('Photoshop') || str.includes('Tamper risk') || str.includes('mismatch detected') || str.includes('Firefly')) {
+    return `<span class="highlight-chip">${escapeHtml(str)}</span>`;
+  }
+  if (str === 'Not recorded' || str === 'Not available' || str === 'None') {
+    return `<span style="color:var(--text-light);font-style:italic;">${escapeHtml(str)}</span>`;
+  }
+  return escapeHtml(str);
+}
+
+function filterMetadata(query) {
+  if (!query || query.trim() === '') {
+    renderTableBody(currentTableRows);
+    document.getElementById('fields-badge').textContent = `Showing all ${currentTableRows.length} metadata fields`;
+    return;
+  }
+  const q = query.toLowerCase().trim();
+  const filtered = currentTableRows.filter(r => {
+    return (r.field && r.field.toLowerCase().includes(q)) ||
+           (r.val_id && String(r.val_id).toLowerCase().includes(q)) ||
+           (r.val_selfie && String(r.val_selfie).toLowerCase().includes(q));
+  });
+  renderTableBody(filtered);
+  document.getElementById('fields-badge').textContent = `Found ${filtered.length} of ${currentTableRows.length} fields`;
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+</script>
+</body>
+</html>
+</body>
+</html>

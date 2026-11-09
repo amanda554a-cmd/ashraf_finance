@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Real Mobile RAW Camera &amp; Authentic EXIF Studio</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand-group">
+      <div class="brand-dot"></div>
+      <div>
+        <div class="brand-title">Real Mobile RAW Camera &amp; Authentic EXIF Studio</div>
+        <div class="brand-subtitle">82+ Authentic Mobile EXIF Tags (`IFD0` + `ExifSubIFD` + `Interop R98` + `GPS` + `IFD1 Thumbnail`) • `FF D8 FF E1` Header • Zero Re-Compression</div>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <span id="serverStatusBadge" class="status-badge status-standalone">Checking Server...</span>
+      <label class="toggle-label" title="Automatically save Real Mobile EXIF JPEG + Raw Stream + JSON to PC folder">
+        <input type="checkbox" id="autoSaveToggle" checked />
+        Auto-Save Mobile Photo to PC (`captures/`)
+      </label>
+    </div>
+  </header>
+
+  <main class="workspace-grid">
+    <!-- Left Column: Live Raw Viewfinder, Mobile EXIF Profile & Controls -->
+    <section class="panel">
+      <div class="panel-title">
+        <span>1. Live Raw Sensor Viewfinder</span>
+        <div style="display:flex; gap:6px;">
+          <button id="btnFlipCamera" class="btn-secondary btn-sm" title="Switch Front / Rear Camera">Flip Front/Back</button>
+          <button id="btnRestartCamera" class="btn-secondary btn-sm" title="Re-initialize stream">Reset Stream</button>
+        </div>
+      </div>
+
+      <div class="viewfinder-box">
+        <video id="videoPreview" playsinline autoplay muted></video>
+        <div class="hud-overlay">
+          <span id="hudSecureContext" class="hud-pill pill-ok">Secure Context</span>
+          <span id="hudPipeline" class="hud-pill pill-ok">Pipeline: Initializing...</span>
+          <span id="hudResolution" class="hud-pill">Stream: -- × --</span>
+          <span id="hudFps" class="hud-pill">FPS: --</span>
+          <span id="hudGps" class="hud-pill">GPS: Acquiring...</span>
+          <span id="hudExifStatus" class="hud-pill pill-info">82-Tag Mobile EXIF Active</span>
+        </div>
+      </div>
+
+      <div class="controls-grid">
+        <div class="control-group full-span">
+          <label for="cameraSelect">Hardware Camera Source (`enumerateDevices`)</label>
+          <select id="cameraSelect">
+            <option value="">Detecting cameras...</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="captureModeSelect">Raw Capture Pipeline</label>
+          <select id="captureModeSelect">
+            <option value="hardware" selected>Hardware Still (`ImageCapture.takePhoto`)</option>
+            <option value="stream-q100">Direct Sensor Stream (Q=1.00 + Mobile EXIF)</option>
+            <option value="lossless-png">Uncompressed 24-bit PNG</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="resolutionSelect">Target Sensor Resolution</label>
+          <select id="resolutionSelect">
+            <option value="max" selected>Max Sensor Native (Up to 8K / 48MP)</option>
+            <option value="4k">4K UHD (3840 × 2160)</option>
+            <option value="1080p">Full HD (1920 × 1080)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Real Mobile Camera EXIF Profile Generator Box -->
+      <div class="native-camera-box" style="border-style:solid; border-color:rgba(16, 185, 129, 0.45);">
+        <div class="native-box-title" style="color:#34d399; display:flex; justify-content:space-between; align-items:center;">
+          <span>Real Mobile Camera EXIF Hardware Profile (82 Tags + IFD1 Thumbnail)</span>
+          <button id="btnReapplyExif" class="btn-emerald btn-sm" title="Re-build Mobile EXIF on currently selected photo">Apply to Current Photo</button>
+        </div>
+
+        <div class="controls-grid">
+          <div class="control-group full-span">
+            <label for="mobileProfileSelect">Select Real Smartphone Camera Profile</label>
+            <select id="mobileProfileSelect">
+              <option value="pixel_10_pro">Google Pixel 10 Pro (Android 16 - HDR+ 6.9mm f/1.68)</option>
+              <option value="pixel_10" selected>Google Pixel 10 (Android 16 - HDR+ 6.81mm f/1.70)</option>
+              <option value="samsung_s24_ultra">Samsung Galaxy S24 Ultra (SM-S928B - 6.3mm f/1.70)</option>
+              <option value="iphone_16_pro">Apple iPhone 16 Pro (iOS 18.1 - 6.765mm f/1.78)</option>
+              <option value="xiaomi_14_ultra">Xiaomi 14 Ultra (Leica Summilux - 8.72mm f/1.63)</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="exifMakeInput">Camera Make (`0x010F`)</label>
+            <input type="text" id="exifMakeInput" value="Google" />
+          </div>
+
+          <div class="control-group">
+            <label for="exifModelInput">Camera Model (`0x0110`)</label>
+            <input type="text" id="exifModelInput" value="Pixel 10" />
+          </div>
+
+          <div class="control-group">
+            <label for="exifSoftwareInput">OS / HDR Firmware (`0x0131`)</label>
+            <input type="text" id="exifSoftwareInput" value="HDR+ 1.0.684521034zd" />
+          </div>
+
+          <div class="control-group">
+            <label for="exifLensInput">Lens Model (`0xA434`)</label>
+            <input type="text" id="exifLensInput" value="Pixel 10 back camera 6.81mm f/1.7" />
+          </div>
+
+          <div class="control-group">
+            <label for="exifApertureInput">Aperture `f/` (`0x829D`) &amp; Focal `mm` (`0x920A`)</label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+              <input type="text" id="exifApertureInput" value="1.7" title="Aperture f-number" />
+              <input type="text" id="exifFocalInput" value="6.81" title="Focal Length (mm)" />
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label for="exifIsoInput">ISO (`0x8827`) &amp; Shutter `1/x` (`0x829A`)</label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+              <input type="text" id="exifIsoInput" value="80" title="ISO Speed" />
+              <input type="text" id="exifShutterInput" value="120" title="Shutter Speed 1/x sec" />
+            </div>
+          </div>
+
+          <div class="control-group full-span">
+            <label>GPS Coordinates (`GPSIFD` - Auto-filled from Live GPS or Custom Override)</label>
+            <div style="display:grid; grid-template-columns:1fr 1fr 90px; gap:6px;">
+              <input type="text" id="exifLatInput" placeholder="Latitude (e.g. 23.810331)" />
+              <input type="text" id="exifLonInput" placeholder="Longitude (e.g. 90.412518)" />
+              <input type="text" id="exifAltInput" placeholder="Alt (m)" value="19.4" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button id="btnTakePhoto" class="btn-primary">Capture Real Mobile RAW Photo</button>
+        <button id="btnRecordVideo" class="btn-record">Record Raw Video</button>
+      </div>
+
+      <!-- Native OS Camera Handoff & File Convert -->
+      <div class="native-camera-box">
+        <div class="native-box-title">Convert Existing Photo to Real Mobile EXIF / Open Native Phone Camera</div>
+        <div class="native-box-desc">
+          Import any photo from your PC/Phone to losslessly inject the 82-tag Real Mobile EXIF header (`PXL_...jpg`), or open the phone's native camera directly.
+        </div>
+        <div class="action-row">
+          <button id="btnImportRawFile" class="btn-emerald btn-sm">Import Photo &amp; Inject Real Mobile EXIF</button>
+          <button id="btnNativeEnvCamera" class="btn-secondary btn-sm">Phone Native Rear Camera</button>
+          <button id="btnNativeUserCamera" class="btn-secondary btn-sm">Phone Native Front Camera</button>
+        </div>
+        <input id="inputNativeEnv" type="file" accept="image/*" capture="environment" class="hidden" />
+        <input id="inputNativeUser" type="file" accept="image/*" capture="user" class="hidden" />
+        <input id="inputRawFile" type="file" accept="image/*,video/*,.dng,.cr2,.nef,.arw,.heic,.heif,.tif,.tiff" class="hidden" />
+      </div>
+
+      <!-- Dynamic Hardware UVC / Camera2 Controls -->
+      <div class="panel-title" style="margin-top:4px;">
+        <span>2. Direct Hardware Sensor Controls (`applyConstraints`)</span>
+        <select id="fillLightSelect" style="padding:3px 8px; font-size:0.75rem;">
+          <option value="off" selected>Flash: Off</option>
+          <option value="auto">Flash: Auto</option>
+          <option value="flash">Flash: On</option>
+        </select>
+      </div>
+      <div id="hardwareControlsContainer" class="hw-controls-grid">
+        <div class="empty-note">Waiting for camera hardware capabilities...</div>
+      </div>
+
+      <!-- Captured Files History -->
+      <div class="panel-title" style="margin-top:4px;">
+        <span>3. Captured Mobile RAW Files</span>
+        <span id="captureCountBadge" class="info-badge">0</span>
+      </div>
+      <div id="capturesList" class="captures-list">
+        <div class="empty-note">No captures yet. Click "Capture Real Mobile RAW Photo" above.</div>
+      </div>
+    </section>
+
+    <!-- Right Column: Deep Forensic Metadata Inspector -->
+    <section class="panel">
+      <div class="panel-title">
+        <span>Real Mobile EXIF &amp; Forensic Binary Inspector</span>
+      </div>
+
+      <div id="inspectorEmptyState" class="inspector-empty">
+        <h3>No Capture Selected</h3>
+        <p style="margin-top:6px; font-size:0.85rem;">
+          Click <strong>"Capture Real Mobile RAW Photo"</strong> or <strong>"Import Photo &amp; Inject Real Mobile EXIF"</strong>.<br/>
+          Your photo will be generated with an authentic `FF D8 FF E1` Mobile EXIF header (`IFD0`, `ExifSubIFD`, `InteropIFD R98`, `GPSIFD`, and embedded `IFD1` JPEG Thumbnail) without re-compressing the image scan bytes.
+        </p>
+      </div>
+
+      <div id="inspectorContent" class="hidden" style="display:flex; flex-direction:column; gap:14px;">
+        <div class="inspector-top-bar">
+          <div class="captured-media-box">
+            <img id="previewImage" alt="Captured Raw Preview" />
+            <video id="previewVideo" controls playsinline class="hidden"></video>
+          </div>
+
+          <div class="inspector-summary-box">
+            <div class="badge-strip">
+              <span id="badgeMobileFilename" class="info-badge" style="border-color:rgba(16,185,129,0.5); color:#6ee7b7;">PXL_0000.jpg</span>
+              <span id="badgeContainerFormat" class="info-badge">JPEG</span>
+              <span id="badgeResolution" class="info-badge">0×0</span>
+              <span id="badgeFileSize" class="info-badge">0 KB</span>
+              <span id="badgeSha256" class="info-badge">SHA-256: --</span>
+            </div>
+
+            <div style="font-size:0.78rem; color:var(--text-muted);">
+              <strong>Real Mobile Photo Ready:</strong>
+              Starts directly with <code>FF D8 FF E1 ... Exif\0\0</code> (no synthetic browser JFIF header), contains <strong>82 authentic mobile EXIF + GPS + Interop + Embedded Thumbnail tags</strong>, and saves with a genuine mobile filename (e.g. <code>PXL_...jpg</code>).
+            </div>
+
+            <div class="download-bar">
+              <button id="btnDownloadExifEnriched" class="btn-emerald btn-sm">Download Real Mobile Photo (`PXL_...jpg`)</button>
+              <button id="btnDownloadRaw" class="btn-secondary btn-sm">Download Raw Stream Bytes</button>
+              <button id="btnDownloadJson" class="btn-secondary btn-sm">Download Full Metadata (.JSON)</button>
+              <button id="btnSaveServer" class="btn-primary btn-sm" style="flex:0 1 auto;">Save to PC (`captures/`)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inspector Navigation Tabs -->
+        <div class="tabs-nav">
+          <button id="tabBtnBinaryExif" class="tab-btn active">Real Mobile EXIF Tags (82 Tags / 5 IFDs)</button>
+          <button id="tabBtnOverview" class="tab-btn">Overview &amp; SHA-256 Integrity</button>
+          <button id="tabBtnHex" class="tab-btn">Binary Hex Header (`FF D8 FF E1`)</button>
+          <button id="tabBtnHardware" class="tab-btn">Chrome Camera Hardware</button>
+          <button id="tabBtnSensors" class="tab-btn">GPS &amp; Motion Sensors</button>
+          <button id="tabBtnSystem" class="tab-btn">Client Hints &amp; GPU</button>
+        </div>
+
+        <!-- Tab Panes -->
+        <div id="tabPaneBinaryExif"></div>
+        <div id="tabPaneOverview" class="hidden"></div>
+        <div id="tabPaneHex" class="hidden"></div>
+        <div id="tabPaneHardware" class="hidden"></div>
+        <div id="tabPaneSensors" class="hidden"></div>
+        <div id="tabPaneSystem" class="hidden"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="exif-engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "chrome-raw-camera-forensic-studio",
+  "version": "1.0.0",
+  "description": "Raw Camera Capture & Full Chrome Hardware/EXIF Metadata Preservation Studio",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
